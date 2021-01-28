@@ -32,39 +32,38 @@ pipeline {
 
 
         stage('Build Docker Image') {
-                            when {
-                                branch 'main'
-                            }
-
-                            steps {
-                                echo '=== Building devops-app Docker Image ==='
-                                script {
-                                    app = docker.build("yahyakharrazi/devops-app")
-                                }
-                            }
-                }
-                stage('Push Docker Image') {
-                            when {
-                                branch 'main'
-                            }
-                            steps {
-                                echo '=== Pushing devops-app Docker Image ==='
-                                script {
-                                    GIT_COMMIT_HASH = sh (script: "git log -n 1 --pretty=format:'%H'", returnStdout: true)
-                                    SHORT_COMMIT = "${GIT_COMMIT_HASH[0..7]}"
-                                    docker.withRegistry('https://registry.hub.docker.com', 'dockerCredentials') {
-                                        app.push("$SHORT_COMMIT")
-                                        app.push("latest")
-                                    }
-                                }
-                            }
-                }
-                stage('Remove local images') {
-                            steps {
-                                echo '=== Delete the local docker images ==='
-                                sh("docker rmi -f yahyakharrazi/devops-app:latest || :")
-                                sh("docker rmi -f yahyakharrazi/devops-app:$SHORT_COMMIT || :")
+            when {
+                branch 'main'
+            }
+            steps {
+                echo '=== Building devops-app Docker Image ==='
+                script {
+                    app = docker.build("yahyakharrazi/devops-app")
                 }
             }
+        }
+        stage('Push Docker Image') {
+            when {
+                branch 'main'
+            }
+            steps {
+                echo '=== Pushing devops-app Docker Image ==='
+                script {
+                    GIT_COMMIT_HASH = sh (script: "git log -n 1 --pretty=format:'%H'", returnStdout: true)
+                    SHORT_COMMIT = "${GIT_COMMIT_HASH[0..7]}"
+                    docker.withRegistry('https://registry.hub.docker.com', 'dockerCredentials') {
+                        app.push("$SHORT_COMMIT")
+                        app.push("latest")
+                    }
+                }
+            }
+        }
+        stage('Remove local images') {
+            steps {
+                echo '=== Delete the local docker images ==='
+                    sh("docker rmi -f yahyakharrazi/devops-app:latest || :")
+                    sh("docker rmi -f yahyakharrazi/devops-app:$SHORT_COMMIT || :")
+            }
+        }
     }
 }
