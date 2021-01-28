@@ -33,7 +33,7 @@ pipeline {
 
         stage('Build Docker Image') {
                             when {
-                                branch 'master'
+                                branch 'main'
                             }
 
                             steps {
@@ -45,7 +45,7 @@ pipeline {
                 }
                 stage('Push Docker Image') {
                             when {
-                                branch 'master'
+                                branch 'main'
                             }
                             steps {
                                 echo '=== Pushing devops-app Docker Image ==='
